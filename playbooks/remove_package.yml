@@ -1,0 +1,9 @@
+---
+- hosts : "{{ target }}"
+  user: root
+  tasks:
+   - name: remove runtime
+     yum:
+           name: packagename
+           state: absent
+

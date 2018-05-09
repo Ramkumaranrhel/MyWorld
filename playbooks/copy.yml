@@ -1,1 +1,12 @@
 ## copy src file to destination
+---
+- hosts : "{{ target }}"
+  user: root
+  tasks:
+
+   - name: "copy a file from local server to remote servers"
+     copy:
+       src: 'path/filename'
+       dest: 'path/filename'
+       mode: 0400
+

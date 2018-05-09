@@ -1,0 +1,16 @@
+---
+- hosts : "{{ target }}"
+  user: root
+  tasks:
+
+   - name: "Install extra sudoers file"
+     copy:
+       src: 'filename'
+       dest: '/etc/sudoers.d/filename'
+       mode: 0400
+
+   - name: "Clean domainadmin group"
+     file:
+       state: absent
+       path: /etc/sudoers.d/filename
+

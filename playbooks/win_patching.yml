@@ -1,0 +1,39 @@
+---
+- name : Apply patch for windows 2012
+  hosts: "{{ target }}"
+  vars:
+     hotfix: 'kb4056898'
+  tasks:
+    - name: Check ping , only for test pourpose
+      win_ping:
+
+    - block:
+        - name: Check if {{ hotfix }} hotfix has been applied
+          raw: Get-Hotfix -Id "{{ hotfix }}"
+          register: hotfix_status
+          failed_when: false
+          changed_when: false
+        - name: show output status
+          debug:
+            var: hotfix_status
+    - block:
+        - win_file:
+            path: "C:\\kbs\\archive"
+            state: directory
+        - win_copy:
+            # LEt0s use internal server instead download from internet
+            src: "/etc/ansible/windows8.1-kb4056898-v2-x64_754f420c1d505f4666437d06ac97175109631bf2.msu"
+            dest: "C:/kbs/{{hotfix}}-x64.msu"
+            force: no
+        - name: unpack the hotfix if needed
+          raw: 'wusa C:\kbs\{{hotfix}}-x64.msu /extract:C:\kbs\archive'
+
+        - name: use dism to install the cab containing the hotfix
+          raw: 'dism.exe /online /add-package  /norestart /PackagePath:C:\kbs\archive\windows8.1-kb4056898-v2-x64.cab'
+          register: dism_output
+          changed_when: "true"
+          failed_when: "dism_output.rc != 0 and dism_output.rc != 3010 and dism_output.rc != 1641"
+
+      # Block execution
+      when: "hotfix_status.rc == 1"
+

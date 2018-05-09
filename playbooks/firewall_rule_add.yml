@@ -1,0 +1,17 @@
+---
+- hosts: "{{ target }}"
+  user: root
+
+  tasks:
+
+   - name: Make sure a firewall is running
+     service:
+       state: reloaded
+       name: firewalld
+
+   - name: Add Mcafee rules to firewall
+     firewalld:
+       port: 13000/tcp
+       permanent: true
+       state: enabled
+
